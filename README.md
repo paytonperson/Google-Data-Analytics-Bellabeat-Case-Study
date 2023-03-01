@@ -54,6 +54,8 @@ library(readr)
 
 ### Importing datasets
 
+For our analysis, only the following csv files will be nessesary: dailyActivity, hourlyCalories, hourlyIntensities, sleepDay, weightLogInfo
+
 ```{r}
 activity <- read_csv("Fitabase Data 4.12.16-5.12.16/dailyActivity_merged.csv")
 View(activity)
@@ -73,6 +75,8 @@ View(weight_log)
 
 ## Data Cleaning & Preparation
 
+Now that we have our data loaded in, we will check our population per dataset.
+
 ```{r}
 n_distinct(activity$Id)
 n_distinct(hourly_calories$Id)
@@ -82,12 +86,25 @@ n_distinct(weight_log$Id)
 ```
 
  Based on our total population of 33 users, the weightlog dataset will have an insufficient sample size to be used in this analysis. 
+ 
+ Now we want to check for duplicates.
 
 ```{r}
 sum(duplicated(sleep))
+
+## [1] 3
+
 sum(duplicated(activity))
+
+## [1] 0
+
 sum(duplicated(hourly_intensities))
+
+## [1] 0
+
 sum(duplicated(hourly_calories))
+
+## [1] 0
 ```
 
 ### Removing duplicates from sleep 
@@ -95,6 +112,8 @@ sum(duplicated(hourly_calories))
 ```{r}
 sleep <- unique(sleep)
 sum(duplicated(sleep)) 
+
+## [1] 0
 ```
 
 ### Standardizing column names 
@@ -142,19 +161,61 @@ activity_sleep <- merge( x = activity, y = sleep, by = c("id", "date"))
 activity %>% 
   select(totalsteps, totaldistance,calories) %>% 
   summary()
+  
+##    totalsteps    totaldistance       calories   
+##  Min.   :    0   Min.   : 0.000   Min.   :   0  
+##  1st Qu.: 3790   1st Qu.: 2.620   1st Qu.:1828  
+##  Median : 7406   Median : 5.245   Median :2134  
+##  Mean   : 7638   Mean   : 5.490   Mean   :2304  
+##  3rd Qu.:10727   3rd Qu.: 7.713   3rd Qu.:2793  
+##  Max.   :36019   Max.   :28.030   Max.   :4900
 
 activity %>% 
   select(veryactiveminutes, fairlyactiveminutes, lightlyactiveminutes, sedentaryminutes) %>% 
   summary()
+  
+##  veryactiveminutes fairlyactiveminutes lightlyactiveminutes sedentaryminutes
+##  Min.   :  0.00    Min.   :  0.00      Min.   :  0.0        Min.   :   0.0  
+##  1st Qu.:  0.00    1st Qu.:  0.00      1st Qu.:127.0        1st Qu.: 729.8  
+##  Median :  4.00    Median :  6.00      Median :199.0        Median :1057.5  
+##  Mean   : 21.16    Mean   : 13.56      Mean   :192.8        Mean   : 991.2  
+##  3rd Qu.: 32.00    3rd Qu.: 19.00      3rd Qu.:264.0        3rd Qu.:1229.5  
+##  Max.   :210.00    Max.   :143.00      Max.   :518.0        Max.   :1440.0
 
 sleep %>% 
   select(totalminutesasleep) %>% 
   summary()
 
+##  totalminutesasleep
+##  Min.   : 58.0     
+##  1st Qu.:361.0     
+##  Median :432.5     
+##  Mean   :419.2     
+##  3rd Qu.:490.0     
+##  Max.   :796.0
+
 hourly_calories_intensities %>% 
   select(totalintensity, averageintensity, calories) %>% 
   summary()
+  
+##  totalintensity   averageintensity    calories     
+##  Min.   :  0.00   Min.   :0.0000   Min.   : 42.00  
+##  1st Qu.:  0.00   1st Qu.:0.0000   1st Qu.: 63.00  
+##  Median :  3.00   Median :0.0500   Median : 83.00  
+##  Mean   : 12.04   Mean   :0.2006   Mean   : 97.39  
+##  3rd Qu.: 16.00   3rd Qu.:0.2667   3rd Qu.:108.00  
+##  Max.   :180.00   Max.   :3.0000   Max.   :948.00
 ```
+
+## Key findings from summarization
+
+  1. The average daily step count of our population is 7638. This is below the CDC recommended step count of 10,000.
+
+  2. The average daily distance traveled was 5.49 miles.
+
+  3. The total user very active and fairly active minutes was 34.72 or 0.59 hours while user’s lightly active and sedentary minutes was 1184 minutes or 19.73 hours.
+
+  4. The average sleep minutes for users was 419.2 or 6.99 hours, which is just under the CDC recommended 7 hours for adults 18-60 years old.
 
 ## Add weekday & seperate date & time
 
